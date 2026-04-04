@@ -308,6 +308,41 @@ function computeAccuracy(records) {
   };
 }
 
+function computeQuizStarBand(quizzes, targetQuizId) {
+  const ranked = quizzes
+    .filter(item => Number.isFinite(Number(item?.percent)))
+    .map(item => ({
+      ...item,
+      percent: Number(item.percent || 0),
+      ts: Number(item.ts || 0),
+    }))
+    .sort((a, b) => {
+      if (b.percent !== a.percent) return b.percent - a.percent;
+      return a.ts - b.ts;
+    });
+
+  if (ranked.length === 0) return null;
+  const index = ranked.findIndex(item => item.id === targetQuizId);
+  if (index === -1) return null;
+
+  const rank = index + 1;
+  const total = ranked.length;
+  const rankPosition = total === 1 ? 1 : ((rank - 1) / (total - 1)) * 100 + 1;
+  const band = Math.min(5, Math.max(1, Math.ceil(rankPosition / 20)));
+  const stars = 6 - band;
+  const rangeStart = (band - 1) * 20 + 1;
+  const rangeEnd = band * 20;
+  const rangeLabel = band === 1 ? '상위 20%' : `상위 ${rangeStart}~${rangeEnd}%`;
+
+  return {
+    rank,
+    total,
+    stars,
+    starText: `${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}`,
+    rangeLabel,
+  };
+}
+
 function getRecent(records, count) {
   if (records.length <= count) return [...records];
   return records.slice(records.length - count);
@@ -1084,8 +1119,9 @@ function setupQuizModeControls() {
 
 // --- UI Navigation Logic ---
 function initTabs() {
-  const navBtns = document.querySelectorAll('.nav-btn');
+  const navBtns = Array.from(document.querySelectorAll('.nav-btn'));
   const tabs = document.querySelectorAll('.tab');
+  const mainContainer = document.getElementById('main-app-container');
 
   navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1100,6 +1136,67 @@ function initTabs() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
+
+  const moveTabByOffset = offset => {
+    const currentIndex = navBtns.findIndex(button => button.classList.contains('active'));
+    if (currentIndex < 0) return;
+    const nextIndex = Math.min(navBtns.length - 1, Math.max(0, currentIndex + offset));
+    if (nextIndex === currentIndex) return;
+    navBtns[nextIndex].click();
+  };
+
+  if (mainContainer) {
+    let startX = 0;
+    let startY = 0;
+    let isTracking = false;
+    const BLOCK_SWIPE_SELECTOR = 'button, input, select, textarea, label, .option-btn, .mistake-btn, .subject-header, .card-collapse-toggle';
+
+    mainContainer.addEventListener(
+      'touchstart',
+      event => {
+        if (event.touches.length !== 1) {
+          isTracking = false;
+          return;
+        }
+        const target = event.target instanceof Element ? event.target : null;
+        if (target?.closest(BLOCK_SWIPE_SELECTOR) || target?.closest('.table-wrap')) {
+          isTracking = false;
+          return;
+        }
+
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        isTracking = true;
+      },
+      { passive: true }
+    );
+
+    mainContainer.addEventListener(
+      'touchend',
+      event => {
+        if (!isTracking || event.changedTouches.length !== 1) return;
+        isTracking = false;
+
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - startX;
+        const deltaY = touch.clientY - startY;
+        const absX = Math.abs(deltaX);
+        const absY = Math.abs(deltaY);
+
+        if (absX < 90) return;
+        if (absY > 60) return;
+        if (absX < absY * 1.4) return;
+
+        if (deltaX < 0) {
+          moveTabByOffset(1);
+        } else {
+          moveTabByOffset(-1);
+        }
+      },
+      { passive: true }
+    );
+  }
 
   const goToQuizCard = document.getElementById('go-to-quiz');
   if (goToQuizCard) {
@@ -1422,7 +1519,8 @@ function showResult() {
     };
   }).filter(item => item.total > 0);
 
-  appendQuizRecord({
+  const quizRecord = {
+    id: createRecordId('quiz'),
     ts: Date.now(),
     mode: currentQuizMode,
     subject: currentQuizContext.subject,
@@ -1433,7 +1531,17 @@ function showResult() {
     durationSec,
     frequentCount,
     perSubject,
-  });
+  };
+  appendQuizRecord(quizRecord);
+  const rankingBand = computeQuizStarBand(loadProgressState().quizzes, quizRecord.id);
+  const rankingHtml = rankingBand
+    ? `
+        <div style="margin-top: 10px; font-size: 20px; letter-spacing: 1px; color: #facc15;">${rankingBand.starText}</div>
+        <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">
+          점수 랭킹 ${rankingBand.rank}위 / ${rankingBand.total}회 · ${rankingBand.rangeLabel}
+        </div>
+      `
+    : '';
 
   renderHomeDashboard();
   renderTodayLearningTab();
@@ -1444,6 +1552,7 @@ function showResult() {
         <div style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 8px;">퀴즈 완료! (${currentQuizMode === 'auto-cycle' && currentQuizContext.cycleStage ? `${getQuizModeLabel(currentQuizMode)} ${currentQuizContext.cycleStage}` : getQuizModeLabel(currentQuizMode)})</div>
         <div style="font-size: 36px; font-weight: 500;" class="${pass ? 'score-pass' : 'score-fail'}">${percent}점</div>
         <div style="font-size: 14px; color: var(--color-text-secondary); margin-top: 4px;">${score} / ${total} 문항 정답 · 빈출 문항 ${frequentCount}개 포함</div>
+        ${rankingHtml}
         <div style="margin-top: 12px; padding: 8px 16px; display:inline-block; border-radius: var(--border-radius-md); background: ${pass ? '#1c3520' : '#3a1f21'}; color: ${pass ? '#b9e69f' : '#f3b2b2'}; font-size: 14px; font-weight: 500;">
           ${pass ? '합격권 수준' : '추가 학습 필요'}
         </div>
