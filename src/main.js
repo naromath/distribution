@@ -1786,6 +1786,7 @@ function handleAuth() {
 
 function showAuth() {
   currentUserId = null;
+  document.body.classList.add('auth-mode');
   document.getElementById('auth-container').style.display = 'block';
   document.getElementById('main-app-container').style.display = 'none';
   document.getElementById('auth-id').value = '';
@@ -1794,6 +1795,7 @@ function showAuth() {
 
 function showMainApp(userId) {
   currentUserId = userId;
+  document.body.classList.remove('auth-mode');
   document.getElementById('auth-container').style.display = 'none';
   document.getElementById('main-app-container').style.display = 'block';
   document.getElementById('user-greeting').textContent = `${userId}님 환영합니다!`;
