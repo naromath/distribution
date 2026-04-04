@@ -1474,6 +1474,11 @@ function showResult() {
 
 // --- Auth Logic ---
 function initAuth() {
+  const logout = () => {
+    localStorage.removeItem('currentUser');
+    showAuth();
+  };
+
   const currentUser = localStorage.getItem('currentUser');
   if (currentUser) {
     showMainApp(currentUser);
@@ -1497,10 +1502,8 @@ function initAuth() {
   });
 
   document.getElementById('auth-action-btn').addEventListener('click', handleAuth);
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('currentUser');
-    showAuth();
-  });
+  document.getElementById('logout-btn')?.addEventListener('click', logout);
+  document.getElementById('mobile-logout-btn')?.addEventListener('click', logout);
 }
 
 function handleAuth() {
@@ -1547,6 +1550,7 @@ function showMainApp(userId) {
   renderQuestionBankSummary();
   renderHomeDashboard();
   renderTodayLearningTab();
+  document.querySelector('.nav-btn[data-target="today"]')?.click();
 }
 
 // --- Init ---

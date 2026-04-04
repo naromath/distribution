@@ -43,13 +43,14 @@
         </div>
 
         <div class="nav">
+          <button class="nav-btn active" data-target="today">오늘 학습</button>
           <button class="nav-btn" data-target="study">과목별 학습</button>
           <button class="nav-btn" data-target="quiz">문제 은행 퀴즈</button>
-          <button class="nav-btn" data-target="today">오늘 학습</button>
-          <button class="nav-btn active" data-target="home">대시보드</button>
+          <button class="nav-btn" data-target="home">대시보드</button>
         </div>
+        <button class="btn-outline mobile-logout-btn" id="mobile-logout-btn">로그아웃</button>
 
-        <div id="home" class="tab active">
+        <div id="home" class="tab">
           <div class="grid-2">
             <div class="metric">
               <div class="metric-label">합격 가능도</div>
@@ -159,7 +160,7 @@
           </div>
         </div>
 
-        <div id="today" class="tab">
+        <div id="today" class="tab active">
           <div class="card">
             <div class="card-title">오늘 해야 할 루틴</div>
             <div class="card-sub" id="today-learning-summary">오늘 학습 시작 전입니다. 아래 버튼으로 바로 시작하세요.</div>
