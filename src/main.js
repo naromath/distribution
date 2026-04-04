@@ -1239,19 +1239,21 @@ function setupMobileHomeCollapsibles() {
 function buildSubjects() {
   const container = document.getElementById('subject-list');
   if (!container) return;
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const docsBase = baseUrl.endsWith('/') ? `${baseUrl}docs/` : `${baseUrl}/docs/`;
 
   const docs = [
     {
       id: 'core',
       title: '유통관리사 핵심요점정리',
       description: '핵심 개념을 빠르게 회독할 수 있는 요약 노트입니다.',
-      src: '/docs/core-notes.pdf',
+      src: `${docsBase}core-notes.pdf`,
     },
     {
       id: 'frequent',
       title: '유통관리사 빈출 100선',
       description: '반복 출제되는 빈출 주제를 중심으로 확인하는 자료입니다.',
-      src: '/docs/frequent-100.pdf',
+      src: `${docsBase}frequent-100.pdf`,
     },
   ];
 
