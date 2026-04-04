@@ -45,6 +45,7 @@
         <div class="nav">
           <button class="nav-btn" data-target="study">과목별 학습</button>
           <button class="nav-btn" data-target="quiz">문제 은행 퀴즈</button>
+          <button class="nav-btn" data-target="today">오늘 학습</button>
           <button class="nav-btn active" data-target="home">대시보드</button>
         </div>
 
@@ -154,6 +155,25 @@
             <div class="card-sub" id="home-recommend-text">학습 데이터를 분석해 과목/모드를 자동 추천합니다.</div>
             <div style="margin-top: 10px;">
               <button class="btn-outline" id="home-recommend-btn" style="font-size:12px; padding:6px 10px;">추천 퀴즈 시작</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="today" class="tab">
+          <div class="card">
+            <div class="card-title">오늘 해야 할 루틴</div>
+            <div class="card-sub" id="today-learning-summary">오늘 학습 시작 전입니다. 아래 버튼으로 바로 시작하세요.</div>
+          </div>
+
+          <div class="today-routine-list" id="today-routine-list">
+            <div class="dashboard-empty">루틴 데이터를 불러오는 중입니다.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">빠른 이동</div>
+            <div class="today-quick-actions">
+              <button class="btn-outline today-action-btn" id="today-quick-frequent">🔥 빈출 20세트 시작</button>
+              <button class="btn-outline today-action-btn" id="today-quick-cycle">🔁 회독 자동 20문제</button>
             </div>
           </div>
         </div>

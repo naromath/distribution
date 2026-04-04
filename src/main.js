@@ -751,6 +751,79 @@ function renderDailyRoutine(answers) {
     .join('');
 }
 
+function renderTodayLearningTab() {
+  const summaryElement = document.getElementById('today-learning-summary');
+  const routineContainer = document.getElementById('today-routine-list');
+  if (!summaryElement || !routineContainer) return;
+
+  const state = loadProgressState();
+  const answers = state.answers || [];
+  const todayKey = getLocalDateKey(Date.now());
+  const todayAnswers = answers.filter(answer => getLocalDateKey(answer.ts) === todayKey);
+  const todayAccuracy = computeAccuracy(todayAnswers);
+  const routine = computeDailyRoutine(answers);
+
+  if (todayAnswers.length === 0) {
+    summaryElement.textContent = '오늘 학습 시작 전입니다. 루틴 버튼을 눌러 바로 시작하세요.';
+  } else {
+    summaryElement.textContent = `오늘 ${todayAnswers.length}문항 풀이 · 정답률 ${todayAccuracy.rate}%`;
+  }
+
+  const actionMap = {
+    solve: {
+      emoji: '🎯',
+      desc: '기출 20~30문항을 풀어 데이터와 감각을 쌓기',
+      buttonLabel: '기출 25문항 시작',
+      action: () => runRecommendedQuiz('전체 과목', 'normal', 25),
+    },
+    classify: {
+      emoji: '🧩',
+      desc: '틀린 문제를 오답 유형으로 분류해 재노출 차단',
+      buttonLabel: '오답 집중 20문항',
+      action: () => runRecommendedQuiz('전체 과목', 'wrong-note', 20),
+    },
+    recover: {
+      emoji: '🔁',
+      desc: '전날 틀린 문제를 다시 풀어 회복률 올리기',
+      buttonLabel: '재도전 10문항',
+      action: () => runRecommendedQuiz('전체 과목', 'wrong-note', 10),
+    },
+  };
+
+  routineContainer.innerHTML = routine
+    .map(item => {
+      const config = actionMap[item.key];
+      const progressRate = Math.min(100, safeRate(item.current, item.target));
+      return `
+        <div class="today-routine-card">
+          <div class="today-routine-title">${config?.emoji || '✅'} ${item.title}</div>
+          <div class="today-routine-desc">${config?.desc || ''}</div>
+          <div class="today-routine-progress">${item.current}/${item.target}${item.unit}</div>
+          <div class="bar-track" style="margin-bottom:10px;"><div class="bar-fill" style="width:${progressRate}%;"></div></div>
+          <button class="btn-outline today-action-btn" data-today-action="${item.key}">${config?.buttonLabel || '시작'}</button>
+        </div>
+      `;
+    })
+    .join('');
+
+  routineContainer.querySelectorAll('[data-today-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const key = button.getAttribute('data-today-action');
+      const action = actionMap[key]?.action;
+      if (action) action();
+    });
+  });
+
+  const quickFrequent = document.getElementById('today-quick-frequent');
+  const quickCycle = document.getElementById('today-quick-cycle');
+  if (quickFrequent) {
+    quickFrequent.onclick = () => runRecommendedQuiz('전체 과목', 'frequent-20', 20);
+  }
+  if (quickCycle) {
+    quickCycle.onclick = () => runRecommendedQuiz('전체 과목', 'auto-cycle', 20);
+  }
+}
+
 function renderErrorTypeBars(answers) {
   const container = document.getElementById('error-type-bars');
   if (!container) return;
@@ -1332,6 +1405,7 @@ function selectAnswer(selectedIndex) {
           classifier.querySelectorAll('.mistake-btn').forEach(node => node.classList.remove('active'));
           button.classList.add('active');
           renderHomeDashboard();
+          renderTodayLearningTab();
         });
       });
     }
@@ -1373,6 +1447,7 @@ function showResult() {
   });
 
   renderHomeDashboard();
+  renderTodayLearningTab();
 
   document.getElementById('quiz-content').innerHTML = `
     <div class="quiz-box">
@@ -1471,6 +1546,7 @@ function showMainApp(userId) {
   document.getElementById('user-greeting').textContent = `${userId}님 환영합니다!`;
   renderQuestionBankSummary();
   renderHomeDashboard();
+  renderTodayLearningTab();
 }
 
 // --- Init ---
