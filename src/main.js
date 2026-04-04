@@ -1236,12 +1236,24 @@ function setupMobileHomeCollapsibles() {
 }
 
 // --- Subject List Logic ---
+function setSubjectOpenState(index, shouldOpen) {
+  const body = document.getElementById(`body-${index}`);
+  const chevron = document.getElementById(`chev-${index}`);
+  if (!body || !chevron) return;
+  body.classList.toggle('open', shouldOpen);
+  chevron.classList.toggle('open', shouldOpen);
+}
+
 function buildSubjects() {
   const container = document.getElementById('subject-list');
   if (!container) return;
+  container.innerHTML = '';
 
   subjectsData.forEach((subjectData, index) => {
-    const summary = coreSummaryBySubject[subjectData.name]?.keyPoints || [];
+    const subjectSummary = coreSummaryBySubject[subjectData.name] || {};
+    const summary = Array.isArray(subjectSummary.keyPoints) ? subjectSummary.keyPoints : [];
+    const chapter = subjectSummary.sourceChapter;
+    const isDefaultOpen = index === 0;
 
     const card = document.createElement('div');
     card.className = 'subject-card';
@@ -1253,10 +1265,10 @@ function buildSubjects() {
         </div>
         <div style="display:flex; align-items:center; gap:10px;">
           <span class="badge ${subjectData.color}">${subjectData.count}</span>
-          <span class="chevron" id="chev-${index}">▶</span>
+          <span class="chevron ${isDefaultOpen ? 'open' : ''}" id="chev-${index}">▶</span>
         </div>
       </div>
-      <div class="subject-body" id="body-${index}">
+      <div class="subject-body ${isDefaultOpen ? 'open' : ''}" id="body-${index}">
         ${subjectData.topics
           .map(topic => `
           <div class="topic-item">
@@ -1267,9 +1279,25 @@ function buildSubjects() {
         `)
           .join('')}
         <div class="topic-item core-summary-item">
-          <div class="topic-name">핵심요점정리 기반 요약</div>
-          <div class="keyword-list">
-            ${summary.slice(0, 8).map(point => `<span class="keyword core-keyword">${point}</span>`).join('')}
+          <div class="topic-name">핵심요점정리 챕터 ${chapter || '-'} 학습 항목 (${summary.length}개)</div>
+          ${
+            summary.length > 0
+              ? `<div class="core-point-list">
+                  ${summary
+                    .map(
+                      (point, pointIndex) => `
+                    <div class="core-point-item">
+                      <span class="core-point-num">${pointIndex + 1}</span>
+                      <div class="core-point-text">${point}</div>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>`
+              : '<div class="topic-desc">핵심요점정리 데이터가 아직 없습니다.</div>'
+          }
+          <div class="subject-action-row">
+            <button class="btn-outline" data-subject-focus="${subjectData.name}">이 과목 빈출 20문제 시작</button>
           </div>
         </div>
       </div>
@@ -1278,11 +1306,32 @@ function buildSubjects() {
 
     document.getElementById(`subj-header-${index}`).addEventListener('click', () => {
       const body = document.getElementById(`body-${index}`);
-      const chevron = document.getElementById(`chev-${index}`);
-      body.classList.toggle('open');
-      chevron.classList.toggle('open');
+      if (!body) return;
+      const shouldOpen = !body.classList.contains('open');
+      setSubjectOpenState(index, shouldOpen);
+    });
+
+    card.querySelector(`[data-subject-focus="${subjectData.name}"]`)?.addEventListener('click', event => {
+      event.stopPropagation();
+      runRecommendedQuiz(subjectData.name, 'frequent-priority', 20);
     });
   });
+
+  const expandAllBtn = document.getElementById('study-expand-all-btn');
+  if (expandAllBtn && !expandAllBtn.dataset.bound) {
+    expandAllBtn.dataset.bound = '1';
+    expandAllBtn.addEventListener('click', () => {
+      subjectsData.forEach((_, index) => setSubjectOpenState(index, true));
+    });
+  }
+
+  const collapseAllBtn = document.getElementById('study-collapse-all-btn');
+  if (collapseAllBtn && !collapseAllBtn.dataset.bound) {
+    collapseAllBtn.dataset.bound = '1';
+    collapseAllBtn.addEventListener('click', () => {
+      subjectsData.forEach((_, index) => setSubjectOpenState(index, false));
+    });
+  }
 }
 
 // --- Quiz Logic ---
