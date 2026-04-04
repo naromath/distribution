@@ -369,6 +369,14 @@ body.auth-mode #app {
   width: 100%;
 }
 
+#quiz-setup-panel {
+  margin-bottom: 0.5rem;
+}
+
+#quiz-setup-panel.is-hidden {
+  display: none;
+}
+
 .quiz-settings { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 1.5rem; }
 .quiz-settings select { padding: 8px 12px; font-size: 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; outline: none; transition: border-color 0.2s; }
 .quiz-settings select:focus { border-color: var(--color-text-primary); }

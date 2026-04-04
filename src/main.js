@@ -1117,6 +1117,20 @@ function setupQuizModeControls() {
   applyMode();
 }
 
+function setQuizSetupPanelVisible(visible) {
+  const panel = document.getElementById('quiz-setup-panel');
+  if (!panel) return;
+  panel.classList.toggle('is-hidden', !visible);
+}
+
+function scrollQuizContentIntoView(block = 'center') {
+  const target = document.getElementById('quiz-content');
+  if (!target) return;
+  requestAnimationFrame(() => {
+    target.scrollIntoView({ behavior: 'smooth', block });
+  });
+}
+
 // --- UI Navigation Logic ---
 function initTabs() {
   const navBtns = Array.from(document.querySelectorAll('.nav-btn'));
@@ -1133,7 +1147,11 @@ function initTabs() {
       tabs.forEach(tab => tab.classList.remove('active'));
       document.getElementById(targetId).classList.add('active');
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (targetId === 'quiz') {
+        scrollQuizContentIntoView('center');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   });
 
@@ -1312,6 +1330,7 @@ function startQuiz() {
 
   const subjectPool = filterQuestionsBySubject(enrichedQuestionsBank, subject);
   if (subjectPool.length === 0) {
+    setQuizSetupPanelVisible(true);
     document.getElementById('quiz-content').innerHTML = `
       <div class="card" style="text-align: center; padding: 2rem;">
         <div style="font-size: 15px; color: var(--color-text-secondary);">해당 과목의 문제가 아직 등록되지 않았습니다.</div>
@@ -1353,7 +1372,9 @@ function startQuiz() {
 
   currentQIndex = 0;
   score = 0;
+  setQuizSetupPanelVisible(false);
   showQuestion();
+  scrollQuizContentIntoView('center');
 }
 
 function showQuestion() {
@@ -1560,6 +1581,7 @@ function showResult() {
         </div>
         <div style="margin-top: 1.5rem; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
           <button class="btn-primary" id="retry-btn">다시 풀기</button>
+          <button class="btn-outline" id="open-quiz-setup-btn">문제 설정 보기</button>
           <button class="btn-outline" id="view-study-btn">학습 자료 보기</button>
         </div>
       </div>
@@ -1567,6 +1589,10 @@ function showResult() {
   `;
 
   document.getElementById('retry-btn').addEventListener('click', startQuiz);
+  document.getElementById('open-quiz-setup-btn').addEventListener('click', () => {
+    setQuizSetupPanelVisible(true);
+    document.getElementById('quiz-setup-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
   document.getElementById('view-study-btn').addEventListener('click', () => {
     document.querySelector('.nav-btn[data-target="study"]').click();
   });
@@ -1648,6 +1674,7 @@ function showMainApp(userId) {
   document.body.classList.remove('auth-mode');
   document.getElementById('auth-container').style.display = 'none';
   document.getElementById('main-app-container').style.display = 'block';
+  setQuizSetupPanelVisible(true);
   document.getElementById('user-greeting').textContent = `${userId}님 환영합니다!`;
   renderQuestionBankSummary();
   renderHomeDashboard();

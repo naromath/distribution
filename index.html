@@ -193,30 +193,32 @@
         </div>
 
         <div id="quiz" class="tab">
-          <div class="quiz-settings">
-            <select id="quiz-mode">
-              <option value="normal" selected>일반 랜덤</option>
-              <option value="frequent-priority">빈출 우선</option>
-              <option value="frequent-20">빈출 20문제 세트</option>
-              <option value="wrong-note">오답 집중 복습</option>
-              <option value="auto-cycle">회독 자동 모드</option>
-            </select>
-            <select id="quiz-subject">
-              <option value="유통물류일반">유통물류일반</option>
-              <option value="상권분석">상권분석</option>
-              <option value="유통마케팅">유통마케팅</option>
-              <option value="유통정보">유통정보</option>
-              <option value="전체 과목">전체 과목 (랜덤)</option>
-            </select>
-            <select id="quiz-count">
-              <option value="5">5문제</option>
-              <option value="10" selected>10문제</option>
-              <option value="20">20문제</option>
-              <option value="30">30문제</option>
-            </select>
-            <button class="btn-primary" id="start-btn">퀴즈 시작</button>
+          <div id="quiz-setup-panel">
+            <div class="quiz-settings">
+              <select id="quiz-mode">
+                <option value="normal" selected>일반 랜덤</option>
+                <option value="frequent-priority">빈출 우선</option>
+                <option value="frequent-20">빈출 20문제 세트</option>
+                <option value="wrong-note">오답 집중 복습</option>
+                <option value="auto-cycle">회독 자동 모드</option>
+              </select>
+              <select id="quiz-subject">
+                <option value="유통물류일반">유통물류일반</option>
+                <option value="상권분석">상권분석</option>
+                <option value="유통마케팅">유통마케팅</option>
+                <option value="유통정보">유통정보</option>
+                <option value="전체 과목">전체 과목 (랜덤)</option>
+              </select>
+              <select id="quiz-count">
+                <option value="5">5문제</option>
+                <option value="10" selected>10문제</option>
+                <option value="20">20문제</option>
+                <option value="30">30문제</option>
+              </select>
+              <button class="btn-primary" id="start-btn">퀴즈 시작</button>
+            </div>
+            <div id="quiz-mode-hint" class="quiz-mode-hint"></div>
           </div>
-          <div id="quiz-mode-hint" class="quiz-mode-hint"></div>
 
           <div id="quiz-content">
             <div class="card" style="text-align: center; padding: 2rem;">
