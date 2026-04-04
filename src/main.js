@@ -1244,6 +1244,112 @@ function setSubjectOpenState(index, shouldOpen) {
   chevron.classList.toggle('open', shouldOpen);
 }
 
+function classifyCorePointType(point) {
+  const text = String(point || '');
+  if (/(비교|차이|구분|vs)/.test(text)) return 'compare';
+  if (/(순서|절차|단계|프로세스)/.test(text)) return 'process';
+  if (/(요인|원칙|기준|유형|분류|기능|특징|장점|단점|모형|이론|전략|기간|비율|횟수|\d)/.test(text)) {
+    return 'memory';
+  }
+  return 'concept';
+}
+
+function getCorePointTypeMeta(type) {
+  if (type === 'compare') {
+    return {
+      label: '비교형',
+      className: 'core-type-compare',
+      checkPrompt: '유사 개념과의 차이를 2가지 말해보세요.',
+    };
+  }
+  if (type === 'process') {
+    return {
+      label: '절차형',
+      className: 'core-type-process',
+      checkPrompt: '단계를 순서대로 말해보세요.',
+    };
+  }
+  if (type === 'memory') {
+    return {
+      label: '암기형',
+      className: 'core-type-memory',
+      checkPrompt: '숫자·기준·주체를 함께 암기했는지 점검하세요.',
+    };
+  }
+  return {
+    label: '개념형',
+    className: 'core-type-concept',
+    checkPrompt: '정의와 목적을 한 문장으로 설명해보세요.',
+  };
+}
+
+function findRelatedTopicForCorePoint(point, topics) {
+  if (!Array.isArray(topics) || topics.length === 0) return null;
+  const normalizedPoint = normalizeForMatch(point);
+  if (!normalizedPoint) return topics[0];
+
+  let bestTopic = topics[0];
+  let bestScore = -1;
+
+  topics.forEach(topic => {
+    const candidateFields = [topic.name, topic.desc, ...(topic.keywords || [])];
+    let score = 0;
+
+    candidateFields.forEach(field => {
+      const normalizedField = normalizeForMatch(field);
+      if (!normalizedField) return;
+      if (normalizedField.includes(normalizedPoint) || normalizedPoint.includes(normalizedField)) {
+        score += 5;
+        return;
+      }
+      if (normalizedPoint.length >= 4 && normalizedField.includes(normalizedPoint.slice(0, 4))) {
+        score += 2;
+      }
+    });
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestTopic = topic;
+    }
+  });
+
+  return bestTopic;
+}
+
+function buildCoreDetailListHtml(summary, subjectData) {
+  if (!Array.isArray(summary) || summary.length === 0) {
+    return '<div class="topic-desc">핵심요점정리 데이터가 아직 없습니다.</div>';
+  }
+
+  return `
+    <div class="core-detail-list">
+      ${summary
+        .map((point, pointIndex) => {
+          const type = classifyCorePointType(point);
+          const typeMeta = getCorePointTypeMeta(type);
+          const relatedTopic = findRelatedTopicForCorePoint(point, subjectData.topics || []);
+          const relatedTopicName = relatedTopic?.name || '핵심 단원';
+          const relatedTopicDesc =
+            relatedTopic?.desc || `${subjectData.name} 과목의 기본 개념과 연결해 복습하세요.`;
+
+          return `
+            <div class="core-detail-card">
+              <div class="core-detail-top">
+                <span class="core-point-num">${pointIndex + 1}</span>
+                <span class="core-type-badge ${typeMeta.className}">${typeMeta.label}</span>
+              </div>
+              <div class="core-detail-title">${point}</div>
+              <div class="core-detail-topic">연결 단원: ${relatedTopicName}</div>
+              <div class="core-detail-desc">${relatedTopicDesc}</div>
+              <div class="core-detail-check">체크 질문: ${typeMeta.checkPrompt}</div>
+            </div>
+          `;
+        })
+        .join('')}
+    </div>
+  `;
+}
+
 function buildSubjects() {
   const container = document.getElementById('subject-list');
   if (!container) return;
@@ -1280,22 +1386,19 @@ function buildSubjects() {
           .join('')}
         <div class="topic-item core-summary-item">
           <div class="topic-name">핵심요점정리 챕터 ${chapter || '-'} 학습 항목 (${summary.length}개)</div>
-          ${
-            summary.length > 0
-              ? `<div class="core-point-list">
-                  ${summary
-                    .map(
-                      (point, pointIndex) => `
-                    <div class="core-point-item">
-                      <span class="core-point-num">${pointIndex + 1}</span>
-                      <div class="core-point-text">${point}</div>
-                    </div>
-                  `
-                    )
-                    .join('')}
-                </div>`
-              : '<div class="topic-desc">핵심요점정리 데이터가 아직 없습니다.</div>'
-          }
+          <div class="core-point-list">
+            ${summary
+              .map(
+                (point, pointIndex) => `
+              <div class="core-point-item">
+                <span class="core-point-num">${pointIndex + 1}</span>
+                <div class="core-point-text">${point}</div>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+          ${buildCoreDetailListHtml(summary, subjectData)}
           <div class="subject-action-row">
             <button class="btn-outline" data-subject-focus="${subjectData.name}">이 과목 빈출 20문제 시작</button>
           </div>
