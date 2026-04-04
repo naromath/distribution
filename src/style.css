@@ -7,6 +7,7 @@
   --color-border-tertiary: #1f2937;
   --border-radius-md: 6px;
   --border-radius-lg: 10px;
+  --mobile-nav-height: 64px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,6 +40,27 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: var(--color-ba
 .card[onclick]:hover, .card#go-to-quiz:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); }
 .card-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
 .card-sub { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+.card-collapse-toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  cursor: pointer;
+}
+.card-collapse-toggle .card-title { margin-bottom: 0; text-align: left; }
+.card-collapse-icon {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s ease;
+}
+.mobile-collapsible-card.is-collapsed .card-collapse-icon {
+  transform: rotate(-90deg);
+}
 
 .subject-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 12px; overflow: hidden; }
 .subject-header { padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background-color 0.2s; }
@@ -149,4 +171,166 @@ tr:last-child td { border-bottom: none; }
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    max-width: 100%;
+    min-height: 100dvh;
+    padding: 1rem 0.9rem calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 1rem);
+    box-shadow: none;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    margin: 0 -0.9rem 1rem;
+    padding: 0.75rem 0.9rem;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(8px);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .header h1 {
+    font-size: 19px;
+  }
+
+  .header p {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    margin: 0;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    border: none;
+    border-top: 0.5px solid var(--color-border-secondary);
+    background: rgba(11, 17, 31, 0.96);
+    backdrop-filter: blur(10px);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .nav-btn {
+    margin: 0;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 4px;
+    font-size: 12px;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .nav-btn.active {
+    border: none;
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .home-sub-grid {
+    margin-top: 0;
+  }
+
+  .card {
+    padding: 0.95rem 1rem;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .mobile-collapsible-card .card-collapse-toggle {
+    min-height: 36px;
+  }
+
+  .mobile-collapsible-card.is-collapsed .card-collapse-content {
+    display: none;
+  }
+
+  .mobile-collapsible-card .card-collapse-content {
+    margin-top: 8px;
+  }
+
+  .bar-row {
+    grid-template-columns: 92px 1fr 78px;
+    gap: 8px;
+  }
+
+  .bar-label {
+    font-size: 12px;
+  }
+
+  .bar-value {
+    font-size: 11px;
+  }
+
+  .trend-row {
+    grid-template-columns: 52px 1fr 88px;
+    gap: 8px;
+  }
+
+  .trend-value {
+    font-size: 11px;
+  }
+
+  .quiz-settings {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .quiz-settings .btn-primary {
+    width: 100%;
+  }
+
+  .quiz-box {
+    padding: 1rem;
+  }
+
+  .quiz-q {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  .option-btn {
+    min-height: 46px;
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  .quiz-nav {
+    position: sticky;
+    bottom: calc(env(safe-area-inset-bottom) + 8px);
+    margin-top: 12px;
+    padding: 10px 0 0;
+    background: var(--color-background-primary);
+    border-top: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .btn-primary,
+  .btn-outline {
+    min-height: 44px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .table-wrap table {
+    min-width: 640px;
+  }
 }

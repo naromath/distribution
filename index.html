@@ -86,44 +86,62 @@
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">과목별 최근 정답률 (최근 50문항 기준)</div>
-            <div class="dashboard-list" id="subject-accuracy-bars">
+          <div class="card mobile-collapsible-card" data-collapse-key="subject-accuracy">
+            <button class="card-collapse-toggle" type="button" data-collapse-target="subject-accuracy-bars" aria-expanded="true">
+              <span class="card-title">과목별 최근 정답률 (최근 50문항 기준)</span>
+              <span class="card-collapse-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dashboard-list card-collapse-content" id="subject-accuracy-bars">
               <div class="dashboard-empty">아직 학습 데이터가 없습니다.</div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">최근 7일 학습 추이</div>
-            <div class="dashboard-list" id="weekly-trend">
+          <div class="card mobile-collapsible-card" data-collapse-key="weekly-trend">
+            <button class="card-collapse-toggle" type="button" data-collapse-target="weekly-trend" aria-expanded="true">
+              <span class="card-title">최근 7일 학습 추이</span>
+              <span class="card-collapse-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dashboard-list card-collapse-content" id="weekly-trend">
               <div class="dashboard-empty">문제를 풀면 일자별 학습량과 정답률이 표시됩니다.</div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">오늘의 2시간 루틴 (40/40/40)</div>
-            <div class="dashboard-list" id="daily-routine">
+          <div class="card mobile-collapsible-card" data-collapse-key="daily-routine" data-collapse-default="open">
+            <button class="card-collapse-toggle" type="button" data-collapse-target="daily-routine" aria-expanded="true">
+              <span class="card-title">오늘의 2시간 루틴 (40/40/40)</span>
+              <span class="card-collapse-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dashboard-list card-collapse-content" id="daily-routine">
               <div class="dashboard-empty">오늘 학습을 시작하면 루틴 진행률이 표시됩니다.</div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">오답 유형 분포 (최근 오답)</div>
-            <div class="dashboard-list" id="error-type-bars">
+          <div class="card mobile-collapsible-card" data-collapse-key="error-type">
+            <button class="card-collapse-toggle" type="button" data-collapse-target="error-type-bars" aria-expanded="true">
+              <span class="card-title">오답 유형 분포 (최근 오답)</span>
+              <span class="card-collapse-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dashboard-list card-collapse-content" id="error-type-bars">
               <div class="dashboard-empty">오답 유형 분류를 시작하면 자동 집계됩니다.</div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">숫자/순서/기준 암기장 (최근 오답 기반)</div>
-            <div class="dashboard-list" id="memory-notes-list">
+          <div class="card mobile-collapsible-card" data-collapse-key="memory-notes">
+            <button class="card-collapse-toggle" type="button" data-collapse-target="memory-notes-list" aria-expanded="true">
+              <span class="card-title">숫자/순서/기준 암기장 (최근 오답 기반)</span>
+              <span class="card-collapse-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dashboard-list card-collapse-content" id="memory-notes-list">
               <div class="dashboard-empty">숫자·절차형 오답이 쌓이면 자동으로 모아드립니다.</div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-title">틀린 선지 함정 패턴</div>
-            <div class="dashboard-list" id="trap-pattern-list">
+          <div class="card mobile-collapsible-card" data-collapse-key="trap-pattern">
+            <button class="card-collapse-toggle" type="button" data-collapse-target="trap-pattern-list" aria-expanded="true">
+              <span class="card-title">틀린 선지 함정 패턴</span>
+              <span class="card-collapse-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dashboard-list card-collapse-content" id="trap-pattern-list">
               <div class="dashboard-empty">오답 선지에서 함정 표현(항상/반드시 등)을 추적합니다.</div>
             </div>
           </div>

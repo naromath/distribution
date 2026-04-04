@@ -1023,6 +1023,10 @@ function initTabs() {
 
       tabs.forEach(tab => tab.classList.remove('active'));
       document.getElementById(targetId).classList.add('active');
+
+      if (window.innerWidth <= 768) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   });
 
@@ -1032,6 +1036,44 @@ function initTabs() {
       document.querySelector('.nav-btn[data-target="quiz"]').click();
     });
   }
+}
+
+function setupMobileHomeCollapsibles() {
+  const cards = document.querySelectorAll('.mobile-collapsible-card');
+  if (cards.length === 0) return;
+
+  const isMobile = window.innerWidth <= 768;
+
+  cards.forEach(card => {
+    const toggle = card.querySelector('.card-collapse-toggle');
+    if (!toggle) return;
+
+    if (!toggle.dataset.bound) {
+      toggle.dataset.bound = '1';
+      toggle.addEventListener('click', () => {
+        if (window.innerWidth > 768) return;
+        const isCollapsed = card.classList.toggle('is-collapsed');
+        toggle.setAttribute('aria-expanded', String(!isCollapsed));
+      });
+    }
+
+    if (!isMobile) {
+      card.classList.remove('is-collapsed');
+      toggle.setAttribute('aria-expanded', 'true');
+      return;
+    }
+
+    if (!card.dataset.mobileInitDone) {
+      const defaultOpen = card.dataset.collapseDefault === 'open';
+      card.classList.toggle('is-collapsed', !defaultOpen);
+      toggle.setAttribute('aria-expanded', String(defaultOpen));
+      card.dataset.mobileInitDone = '1';
+      return;
+    }
+
+    const isCollapsed = card.classList.contains('is-collapsed');
+    toggle.setAttribute('aria-expanded', String(!isCollapsed));
+  });
 }
 
 // --- Subject List Logic ---
@@ -1434,6 +1476,14 @@ function showMainApp(userId) {
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
+  setupMobileHomeCollapsibles();
+  let collapseResizeTimer = null;
+  window.addEventListener('resize', () => {
+    if (collapseResizeTimer) clearTimeout(collapseResizeTimer);
+    collapseResizeTimer = setTimeout(() => {
+      setupMobileHomeCollapsibles();
+    }, 120);
+  });
   buildSubjects();
   setupQuizModeControls();
   initAuth();
