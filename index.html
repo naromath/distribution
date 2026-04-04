@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>유통관리사 2급 학습 플랫폼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app">
+      <!-- 로그인 / 회원가입 컨테이너 -->
+      <div id="auth-container" class="app-container" style="max-width: 400px; margin-top: 10vh; display: none;">
+        <div class="header" style="text-align: center;">
+          <h1 id="auth-title">로그인</h1>
+          <p id="auth-desc">유통관리사 2급 학습 플랫폼에 접속하세요.</p>
+        </div>
+        <div class="card">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px;">아이디</label>
+            <input type="text" id="auth-id" class="text-input" placeholder="아이디">
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px;">비밀번호</label>
+            <input type="password" id="auth-pw" class="text-input" placeholder="비밀번호">
+          </div>
+          <button class="btn-primary" id="auth-action-btn" style="width: 100%; margin-bottom: 10px;">로그인</button>
+          <div style="text-align: center; font-size: 13px; color: var(--color-text-secondary);">
+            <span id="auth-toggle-text">계정이 없으신가요?</span> <span id="auth-toggle-btn" style="color: var(--color-text-primary); cursor: pointer; font-weight: 500; text-decoration: underline;">회원가입</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="main-app-container" class="app-container" style="display: none;">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <h1>유통관리사 2급 학습 플랫폼</h1>
+            <p>대한상공회의소 주관 국가공인 자격증 · 핵심 요약 및 기출/예상 문제은행<br><span id="bank-quality-summary" class="header-sub-note">문제은행 신뢰도 정보를 불러오는 중입니다.</span></p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+            <span id="user-greeting" style="font-size: 13px; color: var(--color-text-secondary);"></span>
+            <button class="btn-outline" id="logout-btn" style="font-size: 12px; padding: 6px 12px;">로그아웃</button>
+          </div>
+        </div>
+
+        <div class="nav">
+          <button class="nav-btn active" data-target="home">홈</button>
+          <button class="nav-btn" data-target="study">과목별 학습</button>
+          <button class="nav-btn" data-target="quiz">문제 은행 퀴즈</button>
+          <button class="nav-btn" data-target="info">시험 정보</button>
+        </div>
+
+        <div id="home" class="tab active">
+          <div class="grid-2">
+            <div class="metric">
+              <div class="metric-label">합격 가능도</div>
+              <div class="metric-value" id="metric-pass-status">-</div>
+              <div class="metric-sub" id="metric-pass-sub">최근 학습 데이터 기준으로 계산합니다.</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">과락 위험 과목</div>
+              <div class="metric-value" id="metric-risk-subject">-</div>
+              <div class="metric-sub" id="metric-risk-sub">최근 50문항/과목 기준</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">기출 정답률 (최근 100)</div>
+              <div class="metric-value" id="metric-recent-accuracy">-</div>
+              <div class="metric-sub" id="metric-recent-sub">누적 정답률과 함께 표시</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">빈출 100선 진도율</div>
+              <div class="metric-value" id="metric-frequent-progress">-</div>
+              <div class="metric-sub" id="metric-frequent-sub">빈출 매칭 문항 기준</div>
+            </div>
+          </div>
+
+          <div class="grid-2 home-sub-grid">
+            <div class="metric">
+              <div class="metric-label">오답 회복률</div>
+              <div class="metric-value" id="metric-recovery-rate">-</div>
+              <div class="metric-sub" id="metric-recovery-sub">틀린 문제를 다시 맞춘 비율</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">실전 페이스</div>
+              <div class="metric-value" id="metric-pace">-</div>
+              <div class="metric-sub" id="metric-pace-sub">목표: 문항당 67초</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">과목별 최근 정답률 (최근 50문항 기준)</div>
+            <div class="dashboard-list" id="subject-accuracy-bars">
+              <div class="dashboard-empty">아직 학습 데이터가 없습니다.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">최근 7일 학습 추이</div>
+            <div class="dashboard-list" id="weekly-trend">
+              <div class="dashboard-empty">문제를 풀면 일자별 학습량과 정답률이 표시됩니다.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">오늘의 2시간 루틴 (40/40/40)</div>
+            <div class="dashboard-list" id="daily-routine">
+              <div class="dashboard-empty">오늘 학습을 시작하면 루틴 진행률이 표시됩니다.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">오답 유형 분포 (최근 오답)</div>
+            <div class="dashboard-list" id="error-type-bars">
+              <div class="dashboard-empty">오답 유형 분류를 시작하면 자동 집계됩니다.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">숫자/순서/기준 암기장 (최근 오답 기반)</div>
+            <div class="dashboard-list" id="memory-notes-list">
+              <div class="dashboard-empty">숫자·절차형 오답이 쌓이면 자동으로 모아드립니다.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">틀린 선지 함정 패턴</div>
+            <div class="dashboard-list" id="trap-pattern-list">
+              <div class="dashboard-empty">오답 선지에서 함정 표현(항상/반드시 등)을 추적합니다.</div>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <p>합격 기준: 각 과목 40점 이상, 전과목 평균 60점 이상 동시 충족<br>→ 한 과목이라도 40점 미만이면 불합격 (과락제)</p>
+          </div>
+
+          <div class="card" style="cursor:pointer;" id="go-to-quiz">
+            <div class="card-title">지금 필요한 퀴즈 시작 →</div>
+            <div class="card-sub" id="home-recommend-text">학습 데이터를 분석해 과목/모드를 자동 추천합니다.</div>
+            <div style="margin-top: 10px;">
+              <button class="btn-outline" id="home-recommend-btn" style="font-size:12px; padding:6px 10px;">추천 퀴즈 시작</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="study" class="tab">
+          <div id="subject-list"></div>
+        </div>
+
+        <div id="quiz" class="tab">
+          <div class="quiz-settings">
+            <select id="quiz-mode">
+              <option value="normal" selected>일반 랜덤</option>
+              <option value="frequent-priority">빈출 우선</option>
+              <option value="frequent-20">빈출 20문제 세트</option>
+              <option value="wrong-note">오답 집중 복습</option>
+              <option value="auto-cycle">회독 자동 모드</option>
+            </select>
+            <select id="quiz-subject">
+              <option value="유통물류일반">유통물류일반</option>
+              <option value="상권분석">상권분석</option>
+              <option value="유통마케팅">유통마케팅</option>
+              <option value="유통정보">유통정보</option>
+              <option value="전체 과목">전체 과목 (랜덤)</option>
+            </select>
+            <select id="quiz-count">
+              <option value="5">5문제</option>
+              <option value="10" selected>10문제</option>
+              <option value="20">20문제</option>
+              <option value="30">30문제</option>
+            </select>
+            <button class="btn-primary" id="start-btn">퀴즈 시작</button>
+          </div>
+          <div id="quiz-mode-hint" class="quiz-mode-hint"></div>
+
+          <div id="quiz-content">
+            <div class="card" style="text-align: center; padding: 2rem;">
+              <div style="font-size: 15px; color: var(--color-text-secondary);">과목과 문제 수를 선택 후 퀴즈를 시작하세요.</div>
+              <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;">모든 문제는 실제 시험과 동일한 5지선다형으로 출제됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="info" class="tab">
+          <div class="info-section">
+            <h3>시험 기본 정보</h3>
+            <div class="table-wrap">
+              <table>
+                <tr><th>항목</th><th>내용</th></tr>
+                <tr><td>시행기관</td><td>대한상공회의소 (KCCI)</td></tr>
+                <tr><td>자격 종류</td><td>국가공인 민간자격</td></tr>
+                <tr><td>시험 방식</td><td>객관식 5지선다 (OMR 카드)</td></tr>
+                <tr><td>총 문항 수</td><td>90문항</td></tr>
+                <tr><td>시험 시간</td><td>100분</td></tr>
+                <tr><td>합격 기준</td><td>평균 60점 이상, 과목별 40점 이상</td></tr>
+                <tr><td>시험 횟수</td><td>연 4~5회</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>1. 과목별 특징 및 공략법</h3>
+            <div class="table-wrap">
+              <table>
+                <tr><th>과목</th><th>특징</th><th>공략 포인트</th></tr>
+                <tr><td><strong>1과목: 유통물류일반</strong></td><td>유통의 기초 이론과 물류 흐름을 다룹니다.</td><td>범위가 넓으므로 용어 정의를 확실히 잡아야 합니다.</td></tr>
+                <tr><td><strong>2과목: 상권분석</strong></td><td>입지 선정, 상권 조사 등 실무적인 내용입니다.</td><td>계산 문제(라일리, 허프 모델 등)가 포함되므로 공식 암기가 필수입니다.</td></tr>
+                <tr><td><strong>3과목: 유통마케팅</strong></td><td>마케팅 믹스(4P), 고객 관리 등을 다룹니다.</td><td>가장 친숙한 내용이 많아 <strong>고득점 전략 과목</strong>으로 삼아야 합니다.</td></tr>
+                <tr><td><strong>4과목: 유통정보</strong></td><td>유통 현장의 IT 기술(POS, RFID 등)을 다룹니다.</td><td>최신 기술 용어가 자주 등장하므로 기출문제를 통해 신규 용어를 익히세요.</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>2. 합격을 위한 3단계 학습 전략</h3>
+            <div style="display: grid; gap: 12px;">
+              <div class="card" style="margin-bottom: 0;">
+                <div class="card-title">1단계: 개념 훑기 (1주일)</div>
+                <div class="card-sub">이론을 100% 이해하려 하기보다 <strong>전체적인 흐름과 용어</strong>에 익숙해지는 단계입니다.<br>• 교재의 요약집을 가볍게 1~2회독 합니다.<br>• 이해가 안 되는 부분은 유튜브의 무료 강의를 활용해 빠르게 넘어갑니다.</div>
+              </div>
+              <div class="card" style="margin-bottom: 0;">
+                <div class="card-title">2단계: 기출문제 무한 반복 (2~3주일)</div>
+                <div class="card-sub">유통관리사 시험은 <strong>문제 은행 방식</strong>의 비중이 높습니다.<br>• 최근 <strong>5개년 기출문제</strong>를 최소 3회독 이상 반복합니다.<br>• 처음에는 풀지 못하더라도 해설지를 보며 문제 유형을 파악하는 것이 중요합니다.</div>
+              </div>
+              <div class="card" style="margin-bottom: 0;">
+                <div class="card-title">3단계: 오답노트 및 계산식 정리 (마무리)</div>
+                <div class="card-sub">• 자주 틀리는 개념은 별도로 정리하여 시험 직전까지 암기합니다.<br>• <strong>2과목의 계산 문제</strong>는 숫자가 바뀌어 반복 출제되므로, 직접 손으로 계산하는 연습을 반복하세요.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>3. 실전 꿀팁</h3>
+            <div style="display: grid; gap: 10px;">
+              <div class="tip-box" style="border-left-color: #D85A30; background: #FAECE7;"><p style="color: #712B13;"><strong>과락을 조심하세요:</strong> 4과목(유통정보)은 용어가 생소해 점수가 안 나올 수 있습니다. 최소 40점은 넘긴다는 전략으로 기출문제 위주로 방어해야 합니다.</p></div>
+              <div class="tip-box" style="border-left-color: #378ADD; background: #E6F1FB;"><p style="color: #0C447C;"><strong>고득점 과목 활용:</strong> 1과목과 3과목에서 80점 이상을 확보하면 평균 점수를 올리기 수월합니다.</p></div>
+              <div class="tip-box" style="border-left-color: #1D9E75; background: #E1F5EE;"><p style="color: #085041;"><strong>CBT 활용:</strong> 온라인 기출문제 사이트(ComCBT 등)를 활용해 틈틈이 스마트폰으로 문제를 풀어보는 습관이 큰 도움이 됩니다.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
