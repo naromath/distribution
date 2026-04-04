@@ -1,5 +1,5 @@
 import './style.css';
-import { subjectsData, questionsBank, questionsBankMeta } from './data/questions.js';
+import { questionsBank, questionsBankMeta } from './data/questions.js';
 import { coreSummaryBySubject, frequent100Topics } from './data/learningAssets.js';
 
 const SUBJECT_ORDER = ['유통물류일반', '상권분석', '유통마케팅', '유통정보'];
@@ -1235,206 +1235,54 @@ function setupMobileHomeCollapsibles() {
   });
 }
 
-// --- Subject List Logic ---
-function setSubjectOpenState(index, shouldOpen) {
-  const body = document.getElementById(`body-${index}`);
-  const chevron = document.getElementById(`chev-${index}`);
-  if (!body || !chevron) return;
-  body.classList.toggle('open', shouldOpen);
-  chevron.classList.toggle('open', shouldOpen);
-}
-
-function classifyCorePointType(point) {
-  const text = String(point || '');
-  if (/(비교|차이|구분|vs)/.test(text)) return 'compare';
-  if (/(순서|절차|단계|프로세스)/.test(text)) return 'process';
-  if (/(요인|원칙|기준|유형|분류|기능|특징|장점|단점|모형|이론|전략|기간|비율|횟수|\d)/.test(text)) {
-    return 'memory';
-  }
-  return 'concept';
-}
-
-function getCorePointTypeMeta(type) {
-  if (type === 'compare') {
-    return {
-      label: '비교형',
-      className: 'core-type-compare',
-      checkPrompt: '유사 개념과의 차이를 2가지 말해보세요.',
-    };
-  }
-  if (type === 'process') {
-    return {
-      label: '절차형',
-      className: 'core-type-process',
-      checkPrompt: '단계를 순서대로 말해보세요.',
-    };
-  }
-  if (type === 'memory') {
-    return {
-      label: '암기형',
-      className: 'core-type-memory',
-      checkPrompt: '숫자·기준·주체를 함께 암기했는지 점검하세요.',
-    };
-  }
-  return {
-    label: '개념형',
-    className: 'core-type-concept',
-    checkPrompt: '정의와 목적을 한 문장으로 설명해보세요.',
-  };
-}
-
-function findRelatedTopicForCorePoint(point, topics) {
-  if (!Array.isArray(topics) || topics.length === 0) return null;
-  const normalizedPoint = normalizeForMatch(point);
-  if (!normalizedPoint) return topics[0];
-
-  let bestTopic = topics[0];
-  let bestScore = -1;
-
-  topics.forEach(topic => {
-    const candidateFields = [topic.name, topic.desc, ...(topic.keywords || [])];
-    let score = 0;
-
-    candidateFields.forEach(field => {
-      const normalizedField = normalizeForMatch(field);
-      if (!normalizedField) return;
-      if (normalizedField.includes(normalizedPoint) || normalizedPoint.includes(normalizedField)) {
-        score += 5;
-        return;
-      }
-      if (normalizedPoint.length >= 4 && normalizedField.includes(normalizedPoint.slice(0, 4))) {
-        score += 2;
-      }
-    });
-
-    if (score > bestScore) {
-      bestScore = score;
-      bestTopic = topic;
-    }
-  });
-
-  return bestTopic;
-}
-
-function buildCoreDetailListHtml(summary, subjectData) {
-  if (!Array.isArray(summary) || summary.length === 0) {
-    return '<div class="topic-desc">핵심요점정리 데이터가 아직 없습니다.</div>';
-  }
-
-  return `
-    <div class="core-detail-list">
-      ${summary
-        .map((point, pointIndex) => {
-          const type = classifyCorePointType(point);
-          const typeMeta = getCorePointTypeMeta(type);
-          const relatedTopic = findRelatedTopicForCorePoint(point, subjectData.topics || []);
-          const relatedTopicName = relatedTopic?.name || '핵심 단원';
-          const relatedTopicDesc =
-            relatedTopic?.desc || `${subjectData.name} 과목의 기본 개념과 연결해 복습하세요.`;
-
-          return `
-            <div class="core-detail-card">
-              <div class="core-detail-top">
-                <span class="core-point-num">${pointIndex + 1}</span>
-                <span class="core-type-badge ${typeMeta.className}">${typeMeta.label}</span>
-              </div>
-              <div class="core-detail-title">${point}</div>
-              <div class="core-detail-topic">연결 단원: ${relatedTopicName}</div>
-              <div class="core-detail-desc">${relatedTopicDesc}</div>
-              <div class="core-detail-check">체크 질문: ${typeMeta.checkPrompt}</div>
-            </div>
-          `;
-        })
-        .join('')}
-    </div>
-  `;
-}
-
+// --- Study Document Logic ---
 function buildSubjects() {
   const container = document.getElementById('subject-list');
   if (!container) return;
-  container.innerHTML = '';
 
-  subjectsData.forEach((subjectData, index) => {
-    const subjectSummary = coreSummaryBySubject[subjectData.name] || {};
-    const summary = Array.isArray(subjectSummary.keyPoints) ? subjectSummary.keyPoints : [];
-    const chapter = subjectSummary.sourceChapter;
-    const isDefaultOpen = index === 0;
+  const docs = [
+    {
+      id: 'core',
+      title: '유통관리사 핵심요점정리',
+      description: '핵심 개념을 빠르게 회독할 수 있는 요약 노트입니다.',
+      src: '/docs/core-notes.pdf',
+    },
+    {
+      id: 'frequent',
+      title: '유통관리사 빈출 100선',
+      description: '반복 출제되는 빈출 주제를 중심으로 확인하는 자료입니다.',
+      src: '/docs/frequent-100.pdf',
+    },
+  ];
 
-    const card = document.createElement('div');
-    card.className = 'subject-card';
-    card.innerHTML = `
-      <div class="subject-header" id="subj-header-${index}">
-        <div>
-          <div class="subject-title">${subjectData.name}</div>
-          <div class="subject-meta">핵심 개념 ${subjectData.topics.length}개 · ${subjectData.count}</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="badge ${subjectData.color}">${subjectData.count}</span>
-          <span class="chevron ${isDefaultOpen ? 'open' : ''}" id="chev-${index}">▶</span>
-        </div>
-      </div>
-      <div class="subject-body ${isDefaultOpen ? 'open' : ''}" id="body-${index}">
-        ${subjectData.topics
-          .map(topic => `
-          <div class="topic-item">
-            <div class="topic-name">${topic.name}</div>
-            <div class="topic-desc">${topic.desc}</div>
-            <div class="keyword-list">${topic.keywords.map(keyword => `<span class="keyword">${keyword}</span>`).join('')}</div>
+  container.innerHTML = `
+    <div class="pdf-library">
+      ${docs
+        .map(
+          doc => `
+        <section class="card pdf-viewer-card" id="study-doc-${doc.id}">
+          <div class="card-title">${doc.title}</div>
+          <div class="card-sub">${doc.description}</div>
+          <div class="pdf-action-row">
+            <a class="btn-outline pdf-link-btn" href="${doc.src}" target="_blank" rel="noopener noreferrer">새 창에서 보기</a>
+            <a class="btn-outline pdf-link-btn" href="${doc.src}" download>다운로드</a>
           </div>
-        `)
-          .join('')}
-        <div class="topic-item core-summary-item">
-          <div class="topic-name">핵심요점정리 챕터 ${chapter || '-'} 학습 항목 (${summary.length}개)</div>
-          <div class="core-point-list">
-            ${summary
-              .map(
-                (point, pointIndex) => `
-              <div class="core-point-item">
-                <span class="core-point-num">${pointIndex + 1}</span>
-                <div class="core-point-text">${point}</div>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-          ${buildCoreDetailListHtml(summary, subjectData)}
-          <div class="subject-action-row">
-            <button class="btn-outline" data-subject-focus="${subjectData.name}">이 과목 빈출 20문제 시작</button>
-          </div>
-        </div>
-      </div>
-    `;
-    container.appendChild(card);
+          <iframe class="pdf-frame" src="${doc.src}#view=FitH" title="${doc.title}" loading="lazy"></iframe>
+        </section>
+      `
+        )
+        .join('')}
+    </div>
+  `;
 
-    document.getElementById(`subj-header-${index}`).addEventListener('click', () => {
-      const body = document.getElementById(`body-${index}`);
-      if (!body) return;
-      const shouldOpen = !body.classList.contains('open');
-      setSubjectOpenState(index, shouldOpen);
-    });
-
-    card.querySelector(`[data-subject-focus="${subjectData.name}"]`)?.addEventListener('click', event => {
-      event.stopPropagation();
-      runRecommendedQuiz(subjectData.name, 'frequent-priority', 20);
-    });
+  const coreJumpBtn = document.getElementById('study-core-jump-btn');
+  const frequentJumpBtn = document.getElementById('study-frequent-jump-btn');
+  coreJumpBtn?.addEventListener('click', () => {
+    document.getElementById('study-doc-core')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-
-  const expandAllBtn = document.getElementById('study-expand-all-btn');
-  if (expandAllBtn && !expandAllBtn.dataset.bound) {
-    expandAllBtn.dataset.bound = '1';
-    expandAllBtn.addEventListener('click', () => {
-      subjectsData.forEach((_, index) => setSubjectOpenState(index, true));
-    });
-  }
-
-  const collapseAllBtn = document.getElementById('study-collapse-all-btn');
-  if (collapseAllBtn && !collapseAllBtn.dataset.bound) {
-    collapseAllBtn.dataset.bound = '1';
-    collapseAllBtn.addEventListener('click', () => {
-      subjectsData.forEach((_, index) => setSubjectOpenState(index, false));
-    });
-  }
+  frequentJumpBtn?.addEventListener('click', () => {
+    document.getElementById('study-doc-frequent')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 
 // --- Quiz Logic ---
