@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>학교 정보 퀴즈</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/distribution/assets/index-CGJIRbYH.js"></script>
+    <script type="module" crossorigin src="/distribution/assets/index-CpMJAWan.js"></script>
     <link rel="stylesheet" crossorigin href="/distribution/assets/index-BTZeX1Ku.css">
   </head>
   <body>
@@ -50,22 +50,43 @@
             <div style="font-size: 60px; margin-bottom: 10px;">🏫</div>
             <div class="card-title" style="font-size: 20px;">학교 정보 퀴즈</div>
             <div class="card-sub" style="margin-bottom: 24px; font-size: 14px;">재미있는 퀴즈를 풀며 우리 학교를 알아보세요.</div>
+            
+            <div style="margin-bottom: 20px; text-align: left; background: var(--color-background-secondary, #111f38); padding: 15px; border-radius: 8px;">
+              <div style="font-size: 14px; color: var(--color-text-secondary, #94a3b8); margin-bottom: 10px;">스피드 조절</div>
+              <div style="display: flex; gap: 15px; justify-content: center;">
+                <label style="font-size: 14px; cursor: pointer;"><input type="radio" name="quiz-speed" value="5000"> 느리게 (5초)</label>
+                <label style="font-size: 14px; cursor: pointer;"><input type="radio" name="quiz-speed" value="3000" checked> 보통 (3초)</label>
+                <label style="font-size: 14px; cursor: pointer;"><input type="radio" name="quiz-speed" value="2000"> 빠르게 (2초)</label>
+              </div>
+            </div>
+
             <button class="btn-primary" id="start-quiz-btn" style="width: 100%; font-size: 16px; padding: 14px; background-color: #3b82f6; border-color: #2563eb; color: #fff;">퀴즈 시작하기</button>
           </div>
         </div>
 
         <div id="quiz-view" class="tab" style="display: none;">
-          <div class="quiz-box" style="padding: 1.5rem 1.2rem; background-color: #0f172a; border-radius: 10px;">
-            <div class="quiz-q-num" id="quiz-progress" style="font-size: 14px; color: #94a3b8; margin-bottom: 12px;"></div>
-            <div class="quiz-q" id="quiz-question" style="font-size: 20px; font-weight: 700; color: #ffffff; line-height: 1.4; word-break: keep-all; margin-bottom: 24px;"></div>
+          <div class="quiz-box" style="padding: 1.5rem 1.2rem; background-color: #0f172a; border-radius: 10px; position: relative; overflow: hidden;">
             
-            <div id="quiz-answer-area" style="display: none; margin-top: 24px;">
-              <div style="font-size: 14px; color: #94a3b8; margin-bottom: 8px;">정답:</div>
-              <div id="quiz-answer" style="font-size: 24px; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); padding: 20px; border-radius: var(--border-radius-md); border: 1px solid rgba(16,185,129,0.3); text-align: center; word-break: keep-all;"></div>
+            <div id="timer-bar-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: rgba(255,255,255,0.1);">
+              <div id="timer-bar" style="width: 100%; height: 100%; background: #3b82f6; transition: width 0.1s linear;"></div>
             </div>
 
-            <button class="btn-primary" id="show-answer-btn" style="width: 100%; margin-top: 24px; font-size: 16px; padding: 14px; background-color: #10b981; border-color: #059669; color: #fff;">정답 보기 😊</button>
-            <button class="btn-primary" id="next-question-btn" style="width: 100%; margin-top: 24px; font-size: 16px; padding: 14px; background-color: #3b82f6; border-color: #2563eb; color: #fff; display: none;">다음 문제 ➡️</button>
+            <div class="quiz-q-num" id="quiz-progress" style="font-size: 14px; color: #94a3b8; margin-top: 10px; margin-bottom: 12px; display: flex; justify-content: space-between;">
+              <span>문제 1 / 50</span>
+              <span id="quiz-timer-text" style="color: #60a5fa; font-weight: 700;">3.0초</span>
+            </div>
+            
+            <div class="quiz-q" id="quiz-question" style="font-size: 20px; font-weight: 700; color: #ffffff; line-height: 1.4; word-break: keep-all; margin-bottom: 24px;"></div>
+            
+            <div id="quiz-options" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+              <!-- 옵션 버튼들이 여기에 동적으로 렌더링됩니다 -->
+            </div>
+
+            <div id="quiz-answer-area" style="display: none; margin-top: 10px;">
+              <div style="font-size: 14px; color: #94a3b8; margin-bottom: 8px;">정답:</div>
+              <div id="quiz-answer" style="font-size: 22px; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); padding: 16px; border-radius: 8px; border: 1px solid rgba(16,185,129,0.3); text-align: center; word-break: keep-all;"></div>
+            </div>
+
           </div>
           <div style="text-align: center; margin-top: 24px;">
             <button class="btn-outline" id="back-to-home-btn" style="font-size: 14px; padding: 10px 20px;">대시보드로 돌아가기</button>
