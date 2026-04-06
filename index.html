@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>학교 정보 퀴즈</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/distribution/assets/index-CUy6k1WV.js"></script>
+    <script type="module" crossorigin src="/distribution/assets/index-D8Bd-Gf9.js"></script>
     <link rel="stylesheet" crossorigin href="/distribution/assets/index-BTZeX1Ku.css">
   </head>
   <body>
@@ -53,10 +53,11 @@
             
             <div style="margin-bottom: 20px; text-align: left; background: var(--color-background-secondary, #111f38); padding: 15px; border-radius: 8px;">
               <div style="font-size: 14px; color: var(--color-text-secondary, #94a3b8); margin-bottom: 10px;">스피드 조절</div>
-              <div style="display: flex; gap: 15px; justify-content: center;">
-                <label style="font-size: 14px; cursor: pointer;"><input type="radio" name="quiz-speed" value="5000"> 느리게 (5초)</label>
-                <label style="font-size: 14px; cursor: pointer;"><input type="radio" name="quiz-speed" value="3000" checked> 보통 (3초)</label>
-                <label style="font-size: 14px; cursor: pointer;"><input type="radio" name="quiz-speed" value="2000"> 빠르게 (2초)</label>
+              <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <label style="font-size: 13px; cursor: pointer;"><input type="radio" name="quiz-speed" value="5000"> 🐢 5초</label>
+                <label style="font-size: 13px; cursor: pointer;"><input type="radio" name="quiz-speed" value="3000" checked> 🚶 3초</label>
+                <label style="font-size: 13px; cursor: pointer;"><input type="radio" name="quiz-speed" value="2000"> 🏃 2초</label>
+                <label style="font-size: 13px; cursor: pointer; color: #ef4444; font-weight: 700;"><input type="radio" name="quiz-speed" value="1000"> ⚡ 1초</label>
               </div>
             </div>
 
@@ -79,6 +80,15 @@
               <p style="font-size: 13px; color: #94a3b8; margin-top: 5px;">전체 유저 중 Top 10의 최고 기록입니다.</p>
             </div>
             
+            <div style="text-align: center; margin-bottom: 15px;">
+              <select id="ranking-speed-select" style="background: #1e293b; color: #f8fafc; border: 1px solid #475569; padding: 8px 12px; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;">
+                <option value="5000">🐢 느리게 (5초) 랭킹</option>
+                <option value="3000" selected>🚶 보통 (3초) 랭킹</option>
+                <option value="2000">🏃 빠르게 (2초) 랭킹</option>
+                <option value="1000">⚡ 미친속도 (1초) 랭킹</option>
+              </select>
+            </div>
+
             <div id="ranking-list" style="display: flex; flex-direction: column; gap: 8px;">
               <div style="text-align: center; color: #94a3b8; padding: 20px;">로딩 중...</div>
             </div>
