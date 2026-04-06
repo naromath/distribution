@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>학교 정보 퀴즈</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/distribution/assets/index-D8Bd-Gf9.js"></script>
+    <script type="module" crossorigin src="/distribution/assets/index-F9t4e8HS.js"></script>
     <link rel="stylesheet" crossorigin href="/distribution/assets/index-BTZeX1Ku.css">
   </head>
   <body>
@@ -52,7 +52,19 @@
             <div class="card-sub" style="margin-bottom: 24px; font-size: 14px;">재미있는 퀴즈를 풀며 우리 학교를 알아보세요.</div>
             
             <div style="margin-bottom: 20px; text-align: left; background: var(--color-background-secondary, #111f38); padding: 15px; border-radius: 8px;">
-              <div style="font-size: 14px; color: var(--color-text-secondary, #94a3b8); margin-bottom: 10px;">스피드 조절</div>
+              <div style="font-size: 14px; color: var(--color-text-secondary, #94a3b8); margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 5px;">⚙️ 퀴즈 설정</div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="font-size: 14px; color: #f8fafc;">🔊 질문 음성으로 듣기</span>
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                  <input type="checkbox" id="voice-enable-chk" checked style="opacity: 0; width: 0; height: 0;">
+                  <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3b82f6; border-radius: 24px; transition: .4s;">
+                    <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; transform: translateX(20px);"></span>
+                  </span>
+                </label>
+              </div>
+
+              <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">스피드 조절</div>
               <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <label style="font-size: 13px; cursor: pointer;"><input type="radio" name="quiz-speed" value="5000"> 🐢 5초</label>
                 <label style="font-size: 13px; cursor: pointer;"><input type="radio" name="quiz-speed" value="3000" checked> 🚶 3초</label>
